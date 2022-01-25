@@ -1,0 +1,418 @@
+from tkinter import*
+from time import sleep
+from tkinter import messagebox as mb
+from random import randint
+from datetime import datetime
+
+
+
+root = Tk()
+
+root.title('Snake')
+root.geometry('800x600')
+
+canvas=Canvas(root, width=800,height=600,bg='white')
+canvas.grid(row=0, column=0)
+
+number=571
+keystrokes=['down']
+
+up='off'
+down='off'
+left='off'
+right='off'
+
+wall='off'
+
+
+list_of_squares=[]
+
+for x in range(0,800,20):
+    for y in range(0,600,20):
+        list_of_squares.append(canvas.create_rectangle(x, y, x+20, y+20))
+        
+left_edge=[]
+for x in range(1,31):
+    left_edge.append(-x)
+
+upper_edge=[]
+for x in range(29,1200,30):
+    upper_edge.append(x)
+
+lower_edge=[]
+for x in range(0,1201,30):
+    lower_edge.append(x)
+
+right_edge=[]
+for x in range(1200,1230):
+    right_edge.append(x)
+
+
+
+list_of_green_squares=[]
+
+
+   
+def go_up(nr):
+    global upper_edge
+    global number
+    global up
+    global list_of_green_squares
+    global keystrokes
+
+    
+    if nr in upper_edge and keystrokes[-1]=='up':
+        wall_hit()
+        return 'wall'
+    
+
+    if up=='on':
+        if canvas.itemcget(list_of_squares[nr], "fill")=='green' and len(list_of_green_squares)>4:
+            return 'wall'
+        red='off'
+        if canvas.itemcget(list_of_squares[nr], "fill")=='red':
+            red='on'
+        canvas.itemconfig(list_of_squares[nr], fill='green')
+        list_of_green_squares.append(list_of_squares[nr])
+        
+        if red=='on':
+            x=randint(0,1199)
+            while canvas.itemcget(list_of_squares[x], "fill")=='green':
+                x=randint(0,1199)
+            canvas.itemconfig(list_of_squares[x], fill='red')
+            
+        nr-=1
+        number=nr
+        canvas.after(250, lambda:[go_up(nr),canvas.itemconfig(list_of_green_squares.pop(0) if red=='off' else False, fill='white')])
+
+        
+
+def go_down(nr):
+    global lower_edge
+    global number
+    global down
+    global list_of_green_squares
+    global keystrokes
+
+    if nr in lower_edge and keystrokes[-1]=='down':
+        wall_hit()
+        return 'wall'
+
+    
+    if down=='on':
+        if canvas.itemcget(list_of_squares[nr], "fill")=='green' and len(list_of_green_squares)>4:
+            wall_hit()
+            return 'wall'
+        red='off'
+        if canvas.itemcget(list_of_squares[nr], "fill")=='red':
+            red='on'
+        canvas.itemconfig(list_of_squares[nr], fill='green')
+        list_of_green_squares.append(list_of_squares[nr])
+
+        if red=='on':
+            x=randint(0,1199)
+            while canvas.itemcget(list_of_squares[x], "fill")=='green':
+                x=randint(0,1199)
+            canvas.itemconfig(list_of_squares[x], fill='red')
+
+        nr+=1
+        number=nr
+        canvas.after(250, lambda:[go_down(nr),canvas.itemconfig(list_of_green_squares.pop(0) if red=='off' else False , fill='white')])
+        
+
+
+def go_left(nr):
+    global left_edge
+    global number
+    global left
+    global list_of_green_squares
+    global keystrokes
+
+
+
+       
+    if nr in left_edge:
+        wall_hit()
+        return 'wall'
+
+    if left=='on':
+        if canvas.itemcget(list_of_squares[nr], "fill")=='green'and len(list_of_green_squares)>4:
+            wall_hit()
+            return 'wall'
+        red='off'
+        if canvas.itemcget(list_of_squares[nr], "fill")=='red':
+            red='on'
+        canvas.itemconfig(list_of_squares[nr], fill='green')
+        list_of_green_squares.append(list_of_squares[nr])
+
+        if red=='on':
+            x=randint(0,1199)
+            while canvas.itemcget(list_of_squares[x], "fill")=='green':
+                x=randint(0,1199)
+            canvas.itemconfig(list_of_squares[x], fill='red')
+        
+        nr-=30
+        number=nr
+        canvas.after(250, lambda:[go_left(nr),canvas.itemconfig(list_of_green_squares.pop(0) if red=='off' else False, fill='white')])
+        
+
+
+def go_right(nr):
+    global number
+    global right
+    global right_edge
+    global list_of_green_squares
+    global keystrokes
+
+
+
+  
+    if nr in right_edge:
+        wall_hit()
+        return 'wall'
+        
+    
+    if right=='on':
+        if canvas.itemcget(list_of_squares[nr], "fill")=='green' and len(list_of_green_squares)>4:
+            wall_hit()
+            return 'wall'
+        red='off'
+        if canvas.itemcget(list_of_squares[nr], "fill")=='red':
+            red='on'
+        canvas.itemconfig(list_of_squares[nr], fill='green')
+        list_of_green_squares.append(list_of_squares[nr])
+
+        if red=='on':
+            x=randint(0,1199)
+            while canvas.itemcget(list_of_squares[x], "fill")=='green':
+                x=randint(0,1199)
+            canvas.itemconfig(list_of_squares[x], fill='red')
+        
+        nr+=30
+        number=nr
+    
+        canvas.after(250, lambda:[go_right(nr),canvas.itemconfig(list_of_green_squares.pop(0) if red=='off' else False, fill='white')])
+        
+    
+
+def left(event):
+    global number
+    
+    global up
+    global down
+    global left
+    global right
+
+    global keystrokes
+
+    global wall
+
+    global upper_edge
+    global lower_edge
+
+
+
+    if right=='on' or left=='on' or wall=='on':
+        return
+
+    
+    down='off'
+    up='off'
+    left='on'
+    right='off'
+    
+    go_left(number)
+    keystrokes.append('left')
+
+def right(event):
+    global number
+
+    global up
+    global down
+    global left
+    global right
+
+    global keystrokes
+
+    global wall
+    global list_of_green_squares
+    global upper_edge
+    global lower_edge
+
+
+
+    if left=='on' or right=='on'or wall=='on' :
+        return
+
+    
+    down='off'
+    up='off'
+    left='off'
+    right='on'
+
+    go_right(number)
+    keystrokes.append('right')
+
+def up(event):
+    global number
+
+    global up
+    global down
+    global left
+    global right
+    global red
+
+    global keystrokes
+    global wall
+    
+    if down=='on' or up=='on' or wall=='on':
+        return
+
+    down='off'
+    up='on'
+    left='off'
+    right='off'
+
+
+    go_up(number)    
+    keystrokes.append('up')
+ 
+
+
+def down(event):
+    global number
+
+
+    global up
+    global down
+    global left
+    global right
+
+    global keystrokes
+    global wall
+
+    if up=='on' or down=='on' or wall=='on':
+        return
+
+
+    down='on'
+    up='off'
+    left='off'
+    right='off'
+    
+
+    go_down(number)
+       
+    keystrokes.append('down')
+
+
+
+counter=3
+
+def blinker():
+
+    
+    global list_of_green_squares
+    global counter
+    global list_of_squares
+
+
+    if counter==0:
+        counter=3
+        return
+    for el in list_of_green_squares:
+        canvas.itemconfig(el, fill='white')
+    counter-=1
+    canvas.after(250, blinker_back)
+    
+
+
+def blinker_back():
+    global list_of_green_squares
+
+    for el in list_of_green_squares:
+        canvas.itemconfig(el, fill='green')
+    canvas.after(250, blinker)
+
+    
+   
+        
+    
+def wall_hit():
+
+    global wall
+  
+    global list_of_green_squares
+    global list_of_squares
+
+    global up
+    global down
+    global left
+    global right
+
+    global number
+    global keystrokes
+
+    print('hit')
+
+    wall='on'
+    
+    blinker()
+
+    down='off'
+    up='off'
+    left='off'
+    right='off'
+    
+    
+    keystrokes=['down']
+
+    number=571
+
+    option=mb.askyesno("Game over", "Do you want to play again?")
+    if option==True:
+        wall='off'
+        for el in list_of_squares:
+            canvas.itemconfig(el, fill='white')
+        list_of_green_squares=[]
+        list_of_green_squares.append(list_of_squares[number])
+  
+        down='on'
+        x=randint(0,1199)
+
+        canvas.itemconfig(list_of_squares[x], fill='red')
+
+        go_down(number)
+    else:
+        for el in list_of_squares:
+            canvas.itemconfig(el, fill='white')
+
+
+root.bind('<Left>',left)
+root.bind('<Right>', right)
+root.bind('<Up>', up)
+root.bind('<Down>', down)
+
+
+
+option=mb.askyesno("Start game", "Do you want to begin playing?")
+if option==True:
+    for el in list_of_green_squares:
+        canvas.itemconfig(el, fill='green')
+    down='on'
+    x=randint(0,1199)
+
+    canvas.itemconfig(list_of_squares[x], fill='red')
+    
+    go_down(number)
+
+
+
+
+
+
+
+
+root.mainloop()
+      
+        
